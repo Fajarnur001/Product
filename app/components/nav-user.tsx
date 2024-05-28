@@ -8,7 +8,6 @@ import { signIn } from "next-auth/react";
 import { ModeToggle } from "./mode-toggle";
 
 export default function NavUser() {
-  const { data: session } = useSession();
   return (
     <div>
       <div
@@ -24,22 +23,11 @@ export default function NavUser() {
         </div>
         <div className={cn("flex items-center gap-x-6")}>
           <div>
-            {" "}
             <ModeToggle />
           </div>
-          <div>
-            {session ? (
-              <>
-                <Button onClick={() => signOut()}>Sing out</Button>
-              </>
-            ) : (
-              <>
-                <Button onClick={() => signIn()}>Sing In</Button>
-              </>
-            )}
+                <Button>Sing out</Button>
           </div>
         </div>
       </div>
-    </div>
   );
 }
