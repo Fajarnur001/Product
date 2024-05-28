@@ -1,0 +1,88 @@
+"use client";
+import React from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Label } from "@radix-ui/react-label";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { useToast } from "@/components/ui/use-toast";
+
+export default function AddTodo({ setTodos }: any) {
+  const [newTodo, setNewTodo] = useState("");
+  const { toast } = useToast();
+  const handlerGetValue = (e) => {
+    setNewTodo(e.target.value);
+  };
+
+  const onSubmitNewTodo = async () => {
+    try {
+      const date = new Date();
+      const create_at = date.toISOString().slice(0, 19).replace("T", " ");
+      const id = date.getTime().toString();
+      const newTodos = {
+        id,
+        created_at: create_at,
+        todo: newTodo,
+        checked: false,
+      };
+      setTodos((prevTodos: any) => [...prevTodos, newTodos]);
+      toast({
+        title: "Scheduled: Catch up",
+        description: "Friday, February 10, 2023 at 5:57 PM",
+      });
+
+      const { data, error } = await supabase
+        .from("todo")
+        .insert([
+          { id: id, created_at: create_at, todo: newTodo, checked: false },
+        ]);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+    } catch (error) {
+      console.error("Error adding new todo:", error);
+    }
+  };
+
+  return (
+    <Dialog>
+      <DialogTrigger>
+        <Button>Add Todo</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add Todo List</DialogTitle>
+          <DialogDescription>
+            Make changes to your profile here. Click save when you're done.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="todo" className="text-right">
+            New Todo
+          </Label>
+          <Input
+            id="username"
+            value={newTodo}
+            onChange={(e) => handlerGetValue(e)}
+            className="col-span-3"
+          />
+        </div>
+        <DialogFooter>
+          <Button type="submit" onClick={onSubmitNewTodo}>
+            Save changes
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
